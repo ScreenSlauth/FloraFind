@@ -1,0 +1,257 @@
+/* Hide Next.js spinner/indicator */
+#__next-build-watcher,
+#__next-route-announcer,
+[data-nextjs-loading-indicator],
+[data-nextjs-dialog],
+[data-nextjs-refresh-indicator],
+[data-nextjs-build-error],
+[data-nextjs-reload-error],
+[data-nextjs-logo],
+[data-next-loading-indicator],
+[data-next-route-announcer],
+[data-next-refresh-indicator],
+[data-next-build-error],
+[data-next-reload-error],
+[data-next-logo],
+#nprogress,
+.nprogress-busy,
+.nprogress-busy *:before,
+.nprogress-busy *:after {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+  overflow: hidden !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Theme (FloraFind PRD) with transparent backgrounds */
+    --background: 0 0% 100% / 0; /* Transparent background */
+    --foreground: 60 10% 10%; /* Dark text for contrast */
+
+    --card: 60 50% 95% / 0.7; /* Semi-transparent card */
+    --card-foreground: 60 10% 10%;
+    --popover: 60 50% 95% / 0.9; /* More opaque popover */
+    --popover-foreground: 60 10% 10%;
+
+    --primary: 122 40% 39%; /* Forest green (#388E3C) */
+    --primary-foreground: 60 50% 95%; /* Light beige/white for text on primary */
+
+    --secondary: 60 30% 85% / 0.8; /* Semi-transparent secondary */
+    --secondary-foreground: 122 40% 30%; /* Darker green text on secondary */
+
+    --muted: 60 30% 88% / 0.6; /* Semi-transparent muted */
+    --muted-foreground: 60 20% 40%; /* Darker beige/gray text */
+
+    --accent: 16 14% 56% / 0.8; /* Semi-transparent accent */
+    --accent-foreground: 60 50% 95%; /* Light beige/white for text on accent */
+
+    --destructive: 0 72% 51%; /* Standard red */
+    --destructive-foreground: 0 0% 98%; /* White text on destructive */
+
+    --border: 60 20% 70% / 0.3; /* Semi-transparent border */
+    --input: 60 30% 88% / 0.5; /* Semi-transparent input */
+    --ring: 122 40% 49% / 0.7; /* Semi-transparent focus rings */
+
+    /* Chart colors */
+    --chart-1: 124 70% 50%;
+    --chart-2: 173 60% 45%;
+    --chart-3: 197 80% 55%;
+    --chart-4: 43 65% 60%;
+    --chart-5: 16 75% 55%;
+    --radius: 0.5rem;
+
+    /* Sidebar variables with transparency */
+    --sidebar-background: 60 50% 93% / 0.7; /* Semi-transparent sidebar */
+    --sidebar-foreground: 60 10% 10%;
+    --sidebar-primary: 122 40% 39%;
+    --sidebar-primary-foreground: 60 50% 95%;
+    --sidebar-accent: 16 14% 56%;
+    --sidebar-accent-foreground: 60 50% 95%;
+    --sidebar-border: 60 20% 70% / 0.3;
+    --sidebar-ring: 122 40% 49%;
+    
+    /* Glass morphism variables */
+    --glass-light-bg: rgba(255, 255, 255, 0.15); 
+    --glass-light-border: rgba(255, 255, 255, 0.25);
+    --glass-light-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    --glass-light-highlight: rgba(255, 255, 255, 0.05);
+    
+    --glass-green-bg: rgba(72, 187, 120, 0.15);
+    --glass-green-border: rgba(72, 187, 120, 0.25);
+    --glass-green-shadow: 0 8px 32px 0 rgba(72, 187, 120, 0.12);
+  }
+
+  .dark {
+    /* Dark Theme with transparency */
+    --background: 0 0% 0% / 0; /* Transparent background */
+    --foreground: 0 0% 98%; 
+
+    --card: 0 0% 10% / 0.7; /* Semi-transparent card */
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 10% / 0.9; /* More opaque popover for readability */
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 145 65% 55%; /* Vibrant Green for dark mode */
+    --primary-foreground: 0 0% 98%; 
+
+    --secondary: 0 0% 15% / 0.8; /* Semi-transparent secondary */
+    --secondary-foreground: 145 65% 75%;
+
+    --muted: 0 0% 20% / 0.6; /* Semi-transparent muted */
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 160 60% 45% / 0.8; /* Semi-transparent accent */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 51%; 
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20% / 0.3; /* Semi-transparent border */
+    --input: 0 0% 15% / 0.5; /* Semi-transparent input */
+    --ring: 145 65% 65% / 0.7;
+
+    --chart-1: 124 70% 50%;
+    --chart-2: 173 60% 45%;
+    --chart-3: 197 80% 55%;
+    --chart-4: 43 65% 60%;
+    --chart-5: 16 75% 55%;
+
+    --sidebar-background: 0 0% 8% / 0.7; /* Semi-transparent sidebar */
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 145 65% 55%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 160 60% 45%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20% / 0.3;
+    --sidebar-ring: 145 65% 65%;
+    
+    /* Glass morphism variables for dark mode */
+    --glass-light-bg: rgba(20, 20, 20, 0.25);
+    --glass-light-border: rgba(40, 40, 40, 0.3);
+    --glass-light-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-light-highlight: rgba(255, 255, 255, 0.03);
+    
+    --glass-green-bg: rgba(56, 161, 105, 0.15);
+    --glass-green-border: rgba(56, 161, 105, 0.25);
+    --glass-green-shadow: 0 8px 32px 0 rgba(56, 161, 105, 0.2);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-transparent text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: transparent;
+  }
+}
+
+@layer components {
+  /* Glass morphism styles */
+  .glass-effect {
+    @apply backdrop-blur-md bg-opacity-20 shadow-lg relative overflow-hidden;
+    background-color: var(--glass-light-bg);
+    box-shadow: var(--glass-light-shadow);
+    border: 1px solid var(--glass-light-border);
+    transition: all 0.3s ease;
+  }
+  
+  .glass-effect::before {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out;
+    content: '';
+    background: var(--glass-light-highlight);
+  }
+  
+  .glass-effect:hover::before {
+    @apply opacity-100;
+  }
+  
+  /* Green glass effect for button and interactive elements */
+  .glass-effect-green {
+    @apply backdrop-blur-md bg-opacity-20 shadow-lg relative overflow-hidden;
+    background-color: var(--glass-green-bg);
+    box-shadow: var(--glass-green-shadow);
+    border: 1px solid var(--glass-green-border);
+    transition: all 0.3s ease;
+  }
+  
+  .glass-effect-green::before {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out;
+    content: '';
+    background: var(--glass-light-highlight);
+  }
+  
+  .glass-effect-green:hover::before {
+    @apply opacity-100;
+  }
+  
+  /* Glass morphism card */
+  .glass-card {
+    @apply glass-effect rounded-xl;
+  }
+  
+  /* Glass morphism button */
+  .glass-button {
+    @apply glass-effect-green rounded-lg px-4 py-2 text-foreground;
+  }
+  
+  .glass-button:hover {
+    @apply transform translate-y-[-2px] shadow-xl;
+  }
+  
+  /* Glass morphism nav item */
+  .glass-nav-item {
+    @apply glass-effect rounded-lg px-3 py-1.5;
+  }
+  
+  .glass-nav-item:hover {
+    @apply bg-opacity-30;
+    background-color: var(--glass-light-bg);
+  }
+  
+  /* Ensure text visibility in light mode */
+  .light .glass-nav-item,
+  .light .glass-button,
+  .light .glass-card {
+    @apply text-gray-900;
+  }
+  
+  /* Glass icon button */
+  .glass-icon-button {
+    @apply glass-effect rounded-full p-2 flex items-center justify-center;
+  }
+  
+  .glass-icon-button:hover {
+    @apply transform scale-110;
+  }
+}
+
+@keyframes sway {
+  0%, 100% { transform: translate(0, -50%); }
+  50% { transform: translate(4px, -50%); }
+}
+
+.animate-sway {
+  animation: sway 2s infinite ease-in-out;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.gradient-background {
+  background-image: linear-gradient(to bottom right, rgba(133, 213, 169, 0.1), rgba(189, 224, 254, 0.1));
+  background-attachment: fixed;
+}
