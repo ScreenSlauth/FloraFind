@@ -118,7 +118,8 @@ export default function PlantIdentifier() {
   const [filePreview, setFilePreview] = useState<string | null>(state.filePreview || null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -154,8 +155,11 @@ export default function PlantIdentifier() {
         title: "Invalid File Type",
         description: "Please select a valid image file",
       });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = "";
+      }
+      if (uploadInputRef.current) {
+        uploadInputRef.current.value = "";
       }
       return;
     }
@@ -167,8 +171,11 @@ export default function PlantIdentifier() {
         title: "File Too Large",
         description: "Please select an image under 10MB",
       });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = "";
+      }
+      if (uploadInputRef.current) {
+        uploadInputRef.current.value = "";
       }
       return;
     }
@@ -190,11 +197,14 @@ export default function PlantIdentifier() {
         lastModified: Date.now(),
       });
 
-      // Update the file input with compressed image
+      // Update both file inputs with compressed image
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(compressedFile);
-      if (fileInputRef.current) {
-        fileInputRef.current.files = dataTransfer.files;
+      if (cameraInputRef.current) {
+        cameraInputRef.current.files = dataTransfer.files;
+      }
+      if (uploadInputRef.current) {
+        uploadInputRef.current.files = dataTransfer.files;
       }
 
     } catch (error) {
@@ -205,8 +215,11 @@ export default function PlantIdentifier() {
         description: "Failed to process image. Please try again.",
       });
       setFilePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = "";
+      }
+      if (uploadInputRef.current) {
+        uploadInputRef.current.value = "";
       }
     } finally {
       setIsProcessing(false);
@@ -215,8 +228,11 @@ export default function PlantIdentifier() {
 
   const handleRemoveImage = () => {
     setFilePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""; 
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = "";
+    }
+    if (uploadInputRef.current) {
+      uploadInputRef.current.value = "";
     }
     state.data = undefined;
     state.error = undefined;
@@ -294,8 +310,8 @@ export default function PlantIdentifier() {
                           accept="image/*"
                           onChange={handleFileChange}
                           capture="environment"
-                          ref={fileInputRef}
-                          required
+                          ref={cameraInputRef}
+                          required={!filePreview}
                         />
                       </label>
                       <label
@@ -313,8 +329,8 @@ export default function PlantIdentifier() {
                           className="sr-only"
                           accept="image/*"
                           onChange={handleFileChange}
-                          ref={fileInputRef}
-                          required
+                          ref={uploadInputRef}
+                          required={!filePreview}
                         />
                       </label>
                     </>
@@ -334,8 +350,8 @@ export default function PlantIdentifier() {
                         className="sr-only"
                         accept="image/*"
                         onChange={handleFileChange}
-                        ref={fileInputRef}
-                        required
+                        ref={uploadInputRef}
+                        required={!filePreview}
                       />
                     </label>
                   )}
