@@ -276,35 +276,69 @@ export default function PlantIdentifier() {
                   </div>
                 )}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center mt-4">
-                  <label
-                    htmlFor="image-upload"
-                    className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
-                  >
-                    <span className="inline-flex items-center px-4 py-2 border border-primary/20 rounded-md hover:border-primary/40 transition-colors">
-                      {isMobile && hasCamera ? (
-                        <>
+                  {isMobile && hasCamera ? (
+                    <>
+                      <label
+                        htmlFor="camera-upload"
+                        className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
+                      >
+                        <span className="inline-flex items-center px-4 py-2 border border-primary/20 rounded-md hover:border-primary/40 transition-colors">
                           <Camera className="w-4 h-4 mr-2" />
                           Take Photo
-                        </>
-                      ) : (
-                        <>
+                        </span>
+                        <Input
+                          id="camera-upload"
+                          name="image"
+                          type="file"
+                          className="sr-only"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          capture="environment"
+                          ref={fileInputRef}
+                          required
+                        />
+                      </label>
+                      <label
+                        htmlFor="image-upload"
+                        className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
+                      >
+                        <span className="inline-flex items-center px-4 py-2 border border-primary/20 rounded-md hover:border-primary/40 transition-colors">
                           <Upload className="w-4 h-4 mr-2" />
-                          Choose File
-                        </>
-                      )}
-                    </span>
-                    <Input
-                      id="image-upload"
-                      name="image"
-                      type="file"
-                      className="sr-only"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      ref={fileInputRef}
-                      required
-                      capture={isMobile && hasCamera ? "environment" : undefined}
-                    />
-                  </label>
+                          Upload Image
+                        </span>
+                        <Input
+                          id="image-upload"
+                          name="image"
+                          type="file"
+                          className="sr-only"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          ref={fileInputRef}
+                          required
+                        />
+                      </label>
+                    </>
+                  ) : (
+                    <label
+                      htmlFor="image-upload"
+                      className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
+                    >
+                      <span className="inline-flex items-center px-4 py-2 border border-primary/20 rounded-md hover:border-primary/40 transition-colors">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Choose File
+                      </span>
+                      <Input
+                        id="image-upload"
+                        name="image"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                        required
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
