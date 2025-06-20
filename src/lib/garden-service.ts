@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase, checkSupabaseConnection } from './supabaseClient';
+import { supabase } from './supabaseClient';
 import { Database } from './database.types';
 import { IdentifyPlantFromImageOutput } from '@/ai/flows/identify-plant-from-image';
 
@@ -18,19 +18,6 @@ export async function savePlantToGarden(
       scientificName: plantData.scientificName, 
       commonName: plantData.commonName
     });
-
-    // Check Supabase connection
-    const connectionStatus = await checkSupabaseConnection();
-    if (!connectionStatus.ok) {
-      console.error("Supabase connection check failed:", connectionStatus.error);
-      return {
-        data: null,
-        error: { 
-          message: 'Unable to connect to the database. Please try again later.',
-          details: connectionStatus.error
-        }
-      };
-    }
 
     // First check if we have a valid session
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();

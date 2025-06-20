@@ -19,9 +19,10 @@ import { generatePlantVariationAction } from "@/lib/actions";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { supabase, checkSupabaseConnection } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { savePlantToGarden } from "@/lib/garden-service";
 import { getSession, getCurrentUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 
 type ExtendedIdentifyOutput = IdentifyPlantFromImageOutput & { isPoisonous?: boolean; toxicityDetails?: string; benefits?: string; };
@@ -106,6 +107,7 @@ function VariationSubmitButton() {
 
 
 export function PlantInfoCard({ data, type, uploadedImagePreview, plantName: initialPlantName }: PlantInfoCardProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [variationState, variationFormAction] = useActionState(generatePlantVariationAction, initialVariationState);
   const [currentVariationDescription, setCurrentVariationDescription] = useState("");
@@ -115,24 +117,29 @@ export function PlantInfoCard({ data, type, uploadedImagePreview, plantName: ini
 
   // Check if user is authenticated
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { session, error } = await getSession();
-        const { user } = await getCurrentUser();
-        
-        if (session && user) {
-          console.log("User authenticated:", user.id);
-          setIsAuthenticated(true);
-        } else {
-          console.log("No active session found", { error });
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Authentication check error:", error);
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && session.user) {
+        setIsAuthenticated(true);
+      } else {
         setIsAuthenticated(false);
       }
+    });
+
+    // Check session on initial load as well
+    const checkInitialSession = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
+        }
     };
-    checkAuth();
+    
+    checkInitialSession();
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -183,46 +190,13 @@ export function PlantInfoCard({ data, type, uploadedImagePreview, plantName: ini
       return;
     }
     
-    // Save to garden
     setSavingToGarden(true);
     
     try {
-      // Check Supabase connection first
-      const connectionStatus = await checkSupabaseConnection();
-      if (!connectionStatus.ok) {
-        toast({
-          title: "Connection Error",
-          description: "Could not connect to the database. Please check your configuration.",
-          variant: "destructive"
-        });
-        console.error("Supabase connection error:", connectionStatus.error);
-        return;
-      }
-      
       if (isIdentification && idData && uploadedImagePreview) {
-        // First, check if the 'plant_images' bucket exists and create it if not
-        const { data: buckets } = await supabase.storage.listBuckets();
-        const bucketExists = buckets?.some(bucket => bucket.name === 'plant_images');
-
-        if (!bucketExists) {
-          try {
-            // Create the bucket with public access
-            await supabase.storage.createBucket('plant_images', {
-              public: true,
-              fileSizeLimit: 10485760 // 10MB
-            });
-            console.log("Created 'plant_images' bucket");
-          } catch (bucketError) {
-            console.error("Error creating bucket:", bucketError);
-            // Continue with the attempt to save to garden anyway
-          }
-        }
-
-        // Upload image to storage first
         let imageUrl = uploadedImagePreview;
         if (uploadedImagePreview.startsWith('data:')) {
           try {
-            // Convert data URI to file
             const base64Data = uploadedImagePreview.split(',')[1];
             const mimeType = uploadedImagePreview.split(';')[0].split(':')[1];
             const buffer = Buffer.from(base64Data, 'base64');
@@ -248,41 +222,49 @@ export function PlantInfoCard({ data, type, uploadedImagePreview, plantName: ini
             imageUrl = publicUrl;
           } catch (uploadError) {
             console.error("Error uploading image:", uploadError);
-            // Fall back to data URI if upload fails
+            toast({
+              title: "Image Upload Failed",
+              description: "Could not save the plant image. Please try again.",
+              variant: "destructive"
+            });
+            setSavingToGarden(false); // Stop loading state
+            return;
           }
         }
-
-        // Then save to garden with image URL
-        const { data: savedPlant, error } = await savePlantToGarden(idData, imageUrl);
         
-        if (error) {
-          console.error("Error saving to garden:", error);
+        const { error: saveError } = await savePlantToGarden(idData, imageUrl);
+        
+        if (saveError) {
+          console.error("Error saving to garden from service:", saveError);
           toast({
-            title: "Error",
-            description: `Failed to save plant to garden: ${error.message || JSON.stringify(error)}`,
+            title: "Error Saving Plant",
+            description: saveError.message || "An unexpected error occurred while saving the plant.",
             variant: "destructive"
           });
         } else {
           setIsSavedInGarden(true);
           toast({
-            title: "Saved to Garden",
-            description: `${commonName || scientificName || 'This plant'} has been added to your garden.`,
+            title: "Success!",
+            description: `${idData.commonName || idData.scientificName} has been saved to your garden. Redirecting...`,
           });
+
+          // Redirect after a short delay
+          setTimeout(() => {
+            router.push('/garden');
+          }, 1500);
         }
       } else {
         toast({
-          title: "Cannot Save",
-          description: "Only identified plants with images can be saved to your garden.",
-          variant: "destructive"
+            title: "Cannot Save Plant",
+            description: "Missing necessary plant data to save.",
+            variant: "destructive"
         });
       }
-    } catch (error) {
-      console.error("Error saving to garden:", error);
+    } catch (error: any) {
+      console.error("Caught an unexpected error in handleSaveToGardenToggle:", error);
       toast({
         title: "Error",
-        description: error instanceof Error 
-          ? `An error occurred: ${error.message}` 
-          : "An unexpected error occurred. Please try again.",
+        description: error?.message || "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -374,30 +356,6 @@ export function PlantInfoCard({ data, type, uploadedImagePreview, plantName: ini
           {type === "information" && regionalInsights && <DetailItem icon={MapPin} label="Regional Insights" value={regionalInsights} />}
           {type === "information" && medicinalApplications && <DetailItem icon={HeartPulse} label="Medicinal Applications" value={medicinalApplications} isList listDisc className={cn(numPostGrowingConditionsItems === 3 && "md:col-span-2")}/>}
         </div>
-
-        {isIdentification && uploadedImagePreview && (
-          <div className="my-6">
-            <Button 
-              onClick={handleSaveToGardenToggle} 
-              variant={isSavedInGarden ? "secondary" : "default"}
-              className="w-full transition-all duration-300 ease-in-out"
-              disabled={savingToGarden || isAuthenticated === null}
-            >
-              {savingToGarden ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Saving to Garden...
-                </>
-              ) : (
-                <>
-                  <Bookmark className={cn("mr-2 h-5 w-5", isSavedInGarden && "fill-current text-primary")} />
-                  {isSavedInGarden ? "Saved to My Garden" : "Add to My Garden"}
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-
 
         {/* Visual Variation Section */}
         <Card className="bg-card/50 backdrop-blur-md border border-primary/20">

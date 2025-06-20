@@ -110,14 +110,14 @@ export default function SignupPage() {
                 Password
               </label>
               <div className="relative group">
-                <Input
-                  id="password"
+              <Input
+                id="password"
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                   className="w-full border-2 bg-background focus:border-primary pr-10 shadow-sm hover:border-primary/50 transition-colors rounded-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  required
-                />
+                required
+              />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -138,14 +138,14 @@ export default function SignupPage() {
                 Confirm Password
               </label>
               <div className="relative group">
-                <Input
-                  id="confirmPassword"
+              <Input
+                id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
                   className="w-full border-2 bg-background focus:border-primary pr-10 shadow-sm hover:border-primary/50 transition-colors rounded-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  required
-                />
+                required
+              />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
